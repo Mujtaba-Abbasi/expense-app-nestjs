@@ -1,31 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { ReportType, data } from './Data';
 import { v4 as uuid } from 'uuid';
+import { ReportResponseDto } from './dtos/report.dto';
 
 @Injectable()
 export class AppService {
   getAllReports(type: ReportType) {
-    return data.report.filter((item) => item.type === type);
+    return data.report
+      .filter((item) => item.type === type)
+      .map((report) => new ReportResponseDto(report));
   }
 
   getReportById(id: string) {
     const reportData = data.report.find((item) => item.id === id);
 
-    return reportData || 'No records found with the provided Id';
+    return (
+      new ReportResponseDto(reportData) ||
+      'No records found with the provided Id'
+    );
   }
 
   createReport(
     reportType: ReportType,
     body: { amount: number; source: string; type: ReportType },
   ) {
-    const { amount, source, type } = body;
-
-    if (!amount) return 'Amount is required.';
-    if (!source) return 'Source is required.';
-    if (!type) return 'Amount is required.';
-
-    if (type !== ReportType.EXPENSE && type !== ReportType.INCOME)
-      return 'Invalid Report type. Report type can either be income or expense.';
+    const { amount, source } = body;
 
     const newReport = {
       id: uuid() as string,
@@ -38,18 +37,13 @@ export class AppService {
 
     data.report.push(newReport);
 
-    return newReport;
+    return new ReportResponseDto(newReport);
   }
 
   updateReport(
     body: { amount: number; source: string; type: ReportType },
     id: string,
   ) {
-    if (!id) return 'Id is required.';
-
-    if (body.type !== ReportType.EXPENSE && body.type !== ReportType.INCOME)
-      return 'Invalid Report type. Report type can either be income or expense.';
-
     const _data = data.report.find((item) => item.id === id);
 
     if (!_data) {
@@ -62,12 +56,10 @@ export class AppService {
 
     data.report.push(newReport);
 
-    return newReport;
+    return new ReportResponseDto(newReport);
   }
 
   deleteReport(id: string) {
-    if (!id) return 'Id is required.';
-
     const reportData = data.report.find((item) => item.id === id);
 
     if (!reportData) {
