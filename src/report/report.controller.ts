@@ -19,7 +19,7 @@ import { ReportService } from './report.service';
 
 @Controller('report/:type')
 export class ReportController {
-  constructor(private readonly appService: ReportService) {}
+  constructor(private readonly reportService: ReportService) {}
 
   @Get()
   getAllReports(
@@ -27,14 +27,14 @@ export class ReportController {
   ): ReportResponseDto[] {
     const reportType =
       type === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
-    return this.appService.getAllReports(reportType);
+    return this.reportService.getAllReports(reportType);
   }
 
   @Get(':id')
   getReportById(
     @Param('id', ParseUUIDPipe) id: string,
   ): ReportResponseDto | string {
-    return this.appService.getReportById(id);
+    return this.reportService.getReportById(id);
   }
 
   @Post()
@@ -45,7 +45,7 @@ export class ReportController {
     const type =
       reportType === 'income' ? ReportType.INCOME : ReportType.EXPENSE;
 
-    return this.appService.createReport(type, body);
+    return this.reportService.createReport(type, body);
   }
 
   @Put(':id')
@@ -53,11 +53,11 @@ export class ReportController {
     @Body() body: UpdateReportDto,
     @Param('id', ParseUUIDPipe) id: string,
   ): ReportResponseDto | string {
-    return this.appService.updateReport(body, id);
+    return this.reportService.updateReport(body, id);
   }
 
   @Delete(':id')
   deleteReport(@Param('id', ParseUUIDPipe) id: string): string {
-    return this.appService.deleteReport(id);
+    return this.reportService.deleteReport(id);
   }
 }
